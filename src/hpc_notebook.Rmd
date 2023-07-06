@@ -9,8 +9,8 @@ This notebook utilizes the bnlearn library for its implementation of hpc.
 
 ```{r}
 library(grid)
-library(BiocGenerics)
 library(graph)
+library(BiocGenerics)
 library(Rgraphviz)
 library(bnlearn)
 library(readr)
@@ -60,9 +60,17 @@ data_bone_lsds40 <- read.csv(path_bone_lsds_40, header = FALSE)
 To start Convert it to a dataframe.
 
 ```{r}
+# Manipulate dataset
 data_lsds_15 <- as.data.frame(data_lsds_15)
 
-data_lsds_15
+
+data <- data_lsds_15
+dsub_set <- subset(data, select=-(1:2))
+dsub_set$Factor.Value <- as.numeric(factor(dsub_set$Factor.Value, levels = unique(dsub_set$Factor.Value)))
+
+
+dsub_set
+
 ```
 
 Looks good! Let's run growshrink
@@ -88,12 +96,70 @@ df_subset <- df[, -column_indices]
 
 
 ```{r}
-dag <- bnlearn::gs(df_subset)
+# dag <- bnlearn::hpc(df_subset)
+dag <- bnlearn::hpc(dsub_set)
 
 graph_dag <- bnlearn::as.graphNEL(dag)
 
+
+
+# Increase the resolution and size of the plot
+png("graph_dag.png", width = 2400, height = 1600, res = 600)
 plot(graph_dag)
+dev.off()
+
 
 ```
 
+```{r}
+# Using DiagrammeR to graph instead
 
+# Install and load the DiagrammeR package
+install.packages("DiagrammeR")
+install.packages("DiagrammeRsvg")
+install.packages('rsvg')
+library(DiagrammeR)
+
+# Convert the bnlearn DAG to a DiagrammeR graph
+graph <- create_graph()
+
+# Add nodes to the graph
+nodes <- graph_dag@nodes
+for (node_name in nodes) {
+  graph <- graph %>% add_node(label = node_name)
+}
+
+# Add edges to the graph
+edges <- edges(graph_dag)
+for (from_node in names(edges)) {
+  from_node <- as.character(edge)
+  
+  for (to_node in edges[from_node]) {
+    to_node <- as.character(to_node)
+    graph <- graph %>% add_edge(graph, from = from_node, to = to_node)
+  
+    # add_edge(graph, from = from_node, to = to_node)
+  }
+}
+
+for (edge in names(edges))
+  print("as.character(edge)")
+
+
+
+# Adjust the font size of the nodes
+graph_dag %>% 
+  graph_attrs(fontsize = 14) %>%  # Set the desired font size
+  node_attrs(fontsize = 14)       # Set the desired font size
+
+
+graph %>% get_node_ids()
+graph %>% count_nodes()
+graph %>% get_node_df()
+graph %>% count_edges()
+#> [1] 2
+
+
+export_graph(graph, file_name= "test.png",file_type = "PNG")
+
+```
