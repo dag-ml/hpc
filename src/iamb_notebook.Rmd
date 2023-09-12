@@ -1,0 +1,108 @@
+---
+title: "H2PC"
+output: html_notebook
+---
+
+
+Install packages
+```{r}
+# install.packages(`bnlearn`)
+# install.packages("BiocManager")
+# BiocManager::install("Rgraphviz")
+# install.packages(c("psych","lavaan"), dependencies=TRUE)
+# install.packages("mltools")
+
+```
+
+
+Setup
+```{r}
+# Load packages
+library(bnlearn)
+library(Rgraphviz)
+library(psych)
+library(lavaan)
+library(mltools)
+library(data.table)
+
+# Set data path
+DATA_PATH <- paste0(getwd(), "/../data/")
+LIB_PATH <- paste0(getwd(), "/lib/")
+PLOT <- paste0(LIB_PATH, "plot_IAMB.R")
+```
+
+
+Turner GLDS-351 (Metaphysis-related variables)
+```{r}
+main <- paste0(LIB_PATH, "lauren.R")
+```
+
+
+Turner GLDS-351 (Epiphysis-related variables)
+```{r}
+main <- paste0(LIB_PATH, "turner_GLDS351_Epiphysis.R")
+```
+
+
+Turner LSDS-30
+```{r}
+main <- paste0(LIB_PATH, "turner_LSDS_30.R")
+```
+
+
+All Ko
+```{r}
+main <- paste0(LIB_PATH, "ko.R")
+```
+
+
+Alwood LSDS-15
+```{r}
+main <- paste0(LIB_PATH, "alwood_LSDS_15.R")
+```
+
+
+
+🐭😲 Deploy Constraint-based learning algorithms 😲🐭
+```{r}
+main <- paste0(LIB_PATH, "lauren.R")
+source(main)
+
+
+# Graphviz plot attributes
+graph_attrs <- list(rankdir = "BT", size = "5,5", bgcolor = "white")
+node_attrs <- list(fontcolor = "black", shape = "circle", style = "filled", fillcolor = "lightyellow")
+node_attrs <- list ()
+edge_attrs <- list(color = "black")
+
+# Plot the DAG
+plot_dag <- function(graph, algo){
+    plot_title <- paste0(algo, " ")
+    plot(graph, attrs = list(graph = graph_attrs, node = node_attrs, edge = edge_attrs))
+    title(plot_title, line = -1, cex.main = 2)
+}
+
+width <- 4800  # Width in pixels
+height <- 4800  # Height in pixels
+
+# Create the PNG file with the specified dimensions
+png(filename = paste0(title,".png"), width = width, height = height, units = "px", res = 500)  # Adjust resolution as needed
+
+dag <- h2pc(dsub_set)
+graph <- as.graphNEL(dag)
+plot_dag(graph, title)
+dev.off()
+
+# dsub_set$chromosome <- NULL
+# print(cor(dsub_set))
+
+
+# # Calculate the correlation matrix
+# cor_matrix <- cor(dsub_set)
+# high_cor_indices <- which(cor_matrix > 1 | cor_matrix <= -0.99, arr.ind = TRUE)
+# high_cor_values <- cor_matrix[high_cor_indices]
+# print(high_cor_values)
+# result <- cbind(row = rownames(high_cor_indices), col = colnames(high_cor_indices), correlation = high_cor_values)
+# print(result)
+
+```
