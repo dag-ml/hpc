@@ -14,7 +14,7 @@ library(DiagrammeR)
 graph2 <- grViz ("
   digraph {
 
-    A [fillcolor=red, style=filled];
+    A [fillcolor=lightyellow, style=filled];
     B [fillcolor=blue, style=filled];
     C [fillcolor=green, style=filled];
     'A' -> B;
@@ -30,17 +30,56 @@ graph2
 
 ```{r}
 
-si <- c("Bgd_Si.350.MeV.n_4", "Bgd_Si.350.MeV.n_8", "Bgd_Si.350.MeV.n_24", "Bgd_Si.350.MeV.n_48", "FociPerGy_Si.350.MeV.n_4", "FociPerGy_Si.350.MeV.n_8", "FociPerGy_Si.350.MeV.n_24", "FociPerGy_Si.350.MeV.n_48")
+si <- list("Bgd_Si.350.MeV.n_4", "Bgd_Si.350.MeV.n_8", "Bgd_Si.350.MeV.n_24", "Bgd_Si.350.MeV.n_48", "FociPerGy_Si.350.MeV.n_4", "FociPerGy_Si.350.MeV.n_8", "FociPerGy_Si.350.MeV.n_24", "FociPerGy_Si.350.MeV.n_48")
 
-ar <- c("Bgd_Ar.350.MeV.n_4", "Bgd_Ar.350.MeV.n_8", "Bgd_Ar.350.MeV.n_24", "Bgd_Ar.350.MeV.n_48", "FociPerGy_Ar.350.MeV.n_4", "FociPerGy_Ar.350.MeV.n_8", "FociPerGy_Ar.350.MeV.n_24", "FociPerGy_Ar.350.MeV.n_48")
+ar <- list("Bgd_Ar.350.MeV.n_4", "Bgd_Ar.350.MeV.n_8", "Bgd_Ar.350.MeV.n_24", "Bgd_Ar.350.MeV.n_48", "FociPerGy_Ar.350.MeV.n_4", "FociPerGy_Ar.350.MeV.n_8", "FociPerGy_Ar.350.MeV.n_24", "FociPerGy_Ar.350.MeV.n_48")
 
 fe <- c("Bgd_Fe.600.MeV.n_4", "Bgd_Fe.600.MeV.n_8", "Bgd_Fe.600.MeV.n_24", "Bgd_Fe.600.MeV.n_48", "FociPerGy_Fe.600.MeV.n_4", "FociPerGy_Fe.600.MeV.n_8", "FociPerGy_Fe.600.MeV.n_24", "FociPerGy_Fe.600.MeV.n_48")
 
 xray <- c("Bgd_X.ray_4", "Bgd_X.ray_24", "Bgd_X.ray_48", "FociPerGy_X.ray_4", "FociPerGy_X.ray_24", "FociPerGy_X.ray_48")
 
+colors <- c("lightcoral","chocolate2","lightyellow","lightgreen","lightblue","purple","seashell")
+
+# 
+# pca_nodes <- (si,ar,fe,xray)
+# 
+# ColoredNodes <- data.frame(Color=colors,PCA_nodes=pca_nodes)
+
 
 ```
 
+
+```{r}
+buildColorDict <- function(..., colors=c()) {
+  stack <- list(...)
+  if (length(colors) == 0) {
+    colors <- c("lightcoral","chocolate2","lightyellow","lightgreen","lightblue","purple","seashell")
+  }
+  
+  
+  # throw error if len(...) < len(colors)
+  if (length(stack) > length(colors)) {
+    err_message <- "There are more PCA groups than provided colors."
+    stop(err_message)
+  }
+  # 
+  # print(length(colors))
+  # print(length(stack))
+  
+  out <- list()
+  i <- 1
+  for (pca_group in stack) {
+    for (node in pca_group) {
+      out[[node]] <- colors[i]
+    }
+    i <- i + 1
+  }
+  return(out)
+}
+
+alt_colors <- c("lightyellow","lightgreen")
+ColoredNodes <- buildColorDict(si,ar,fe,xray)
+```
 
 
 
@@ -49,11 +88,21 @@ xray <- c("Bgd_X.ray_4", "Bgd_X.ray_24", "Bgd_X.ray_48", "FociPerGy_X.ray_4", "F
 
 convertNELtoStr <- function(dag, colorNodes) { # dag: Formal graphNEL, colorNodes: List
   nodes <- dag@nodes
-  ans <- 'digraph { '
+  ans <- 'digraph { graph[layout=circo]'
+  
+  
+   # A [fillcolor=lightyellow, style=filled];
   
   # Add nodes
   for (node in nodes) {
-    ans <- paste0(ans,'"',node,'";')
+    if (exists(node, where = colorNodes)) {
+      ans <- paste0(ans,'"',node,'" [fillcolor=', colorNodes[[node]], ', style=filled];')
+    } else {
+      ans <- paste0(ans,'"',node,'";')
+    }
+    
+    # ans <- paste0(ans,'"',node,'" [fillcolor=', colorNodes[[node]], ', style=filled];')
+    # ans <- paste0(ans,'"',node,'";')
   }
   
   # Add edges
@@ -68,7 +117,7 @@ convertNELtoStr <- function(dag, colorNodes) { # dag: Formal graphNEL, colorNode
 }
 
 
-answer <- convertNELtoStr(graph, colorNodes)
+answer <- convertNELtoStr(graph, ColoredNodes)
 grViz(answer)
 ```
 
