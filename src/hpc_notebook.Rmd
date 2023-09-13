@@ -37,7 +37,7 @@ FULL_OUT_PATH <- paste0(OUT_PATH, "/Single Node PCA/") # Change accordingly
 Select Dataset to Analyze
 ```{r}
 datasets <- c("lauren.R", "turner_GLDS351_Epiphysis.R", "turner_LSDS_30.R", "ko.R", "alwood_LSDS_15.R")
-dataset <- datasets[2]
+dataset <- datasets[1]
 
 load_Dataset <- paste0(LIB_PATH, dataset)
 ```
