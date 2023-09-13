@@ -1,0 +1,52 @@
+---
+title: "H2PC"
+output: html_notebook
+---
+
+
+Install packages
+```{r}
+# install.packages(`bnlearn`)
+# install.packages("BiocManager")
+# BiocManager::install("Rgraphviz")
+# install.packages(c("psych","lavaan"), dependencies=TRUE)
+# install.packages("mltools")
+
+```
+
+
+Setup
+```{r}
+# Load packages
+library(bnlearn)
+library(Rgraphviz)
+library(psych)
+library(lavaan)
+library(mltools)
+library(data.table)
+
+# Set data path
+DATA_PATH <- paste0(getwd(), "/../data/")
+LIB_PATH <- paste0(getwd(), "/lib/")
+OUT_PATH <- paste0(getwd(), "/../graphs/")
+
+PLOT <- paste0(LIB_PATH, "plot_IAMB.R")
+FULL_OUT_PATH <- paste0(OUT_PATH, "/Single Node PCA/") # Change accordingly
+```
+
+Select Dataset to Analyze
+```{r}
+datasets <- c("lauren.R", "turner_GLDS351_Epiphysis.R", "turner_LSDS_30.R", "ko.R", "alwood_LSDS_15.R")
+dataset <- datasets[2]
+
+load_Dataset <- paste0(LIB_PATH, dataset)
+```
+
+
+🐭😲 Deploy Constraint-based learning algorithms 😲🐭
+```{r}
+source(load_Dataset)
+dag <- h2pc(dsub_set)
+
+source(PLOT)
+```
