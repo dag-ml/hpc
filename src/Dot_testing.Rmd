@@ -38,7 +38,7 @@ graph2
 Test Lauren Dataset
 ```{r}
 source(PLOT)
-datasets <- c("lauren.R", "turner_GLDS351_Epiphysis.R", "turner_LSDS_30.R", "ko.R", "alwood_LSDS_15.R")
+datasets <- c("lauren2.R", "lauren.R", "turner_GLDS351_Epiphysis.R", "turner_LSDS_30.R", "ko.R", "alwood_LSDS_15.R")
 dataset <- datasets[1]
 
 load_Dataset <- paste0(LIB_PATH, dataset)
