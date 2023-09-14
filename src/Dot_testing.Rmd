@@ -5,12 +5,21 @@ output: html_notebook
  
 ```{r}
 library(DiagrammeR)
+library(DOT)
+
+DATA_PATH <- paste0(getwd(), "/../data/")
+LIB_PATH <- paste0(getwd(), "/lib/")
+OUT_PATH <- paste0(getwd(), "/../graphs/")
+FULL_OUT_PATH <- paste0(OUT_PATH, "Single Node PCA/") # Change accordingly
+
+PLOT <- paste0(LIB_PATH, "plot_Color.R")
+DOT_OUT_PATH <- paste0("/../graphs/Single Node PCA/") # Relative out path for DOT package
+
 ```
  
 
 ```{r}
-
-# Create a DOT graph
+# Example DOT Graph
 graph2 <- grViz ("
   digraph {
 
@@ -21,131 +30,41 @@ graph2 <- grViz ("
     B -> C;
     C -> A;
   }")
-
 graph2
 
 
 ```
 
-
+Test Lauren Dataset
 ```{r}
+source(PLOT)
+datasets <- c("lauren.R", "turner_GLDS351_Epiphysis.R", "turner_LSDS_30.R", "ko.R", "alwood_LSDS_15.R")
+dataset <- datasets[1]
 
-si <- list("Bgd_Si.350.MeV.n_4", "Bgd_Si.350.MeV.n_8", "Bgd_Si.350.MeV.n_24", "Bgd_Si.350.MeV.n_48", "FociPerGy_Si.350.MeV.n_4", "FociPerGy_Si.350.MeV.n_8", "FociPerGy_Si.350.MeV.n_24", "FociPerGy_Si.350.MeV.n_48")
-
-ar <- list("Bgd_Ar.350.MeV.n_4", "Bgd_Ar.350.MeV.n_8", "Bgd_Ar.350.MeV.n_24", "Bgd_Ar.350.MeV.n_48", "FociPerGy_Ar.350.MeV.n_4", "FociPerGy_Ar.350.MeV.n_8", "FociPerGy_Ar.350.MeV.n_24", "FociPerGy_Ar.350.MeV.n_48")
-
-fe <- c("Bgd_Fe.600.MeV.n_4", "Bgd_Fe.600.MeV.n_8", "Bgd_Fe.600.MeV.n_24", "Bgd_Fe.600.MeV.n_48", "FociPerGy_Fe.600.MeV.n_4", "FociPerGy_Fe.600.MeV.n_8", "FociPerGy_Fe.600.MeV.n_24", "FociPerGy_Fe.600.MeV.n_48")
-
-xray <- c("Bgd_X.ray_4", "Bgd_X.ray_24", "Bgd_X.ray_48", "FociPerGy_X.ray_4", "FociPerGy_X.ray_24", "FociPerGy_X.ray_48")
-
-colors <- c("lightcoral","chocolate2","lightyellow","lightgreen","lightblue","purple","seashell")
-
-# 
-# pca_nodes <- (si,ar,fe,xray)
-# 
-# ColoredNodes <- data.frame(Color=colors,PCA_nodes=pca_nodes)
-
+load_Dataset <- paste0(LIB_PATH, dataset)
+source(load_Dataset)
+dag <- h2pc(dsub_set)
 
 ```
 
 
 ```{r}
-buildColorDict <- function(..., colors=c()) {
-  stack <- list(...)
-  if (length(colors) == 0) {
-    colors <- c("lightcoral","chocolate2","lightyellow","lightgreen","lightblue","purple","seashell")
-  }
-  
-  
-  # throw error if len(...) < len(colors)
-  if (length(stack) > length(colors)) {
-    err_message <- "There are more PCA groups than provided colors."
-    stop(err_message)
-  }
-  # 
-  # print(length(colors))
-  # print(length(stack))
-  
-  out <- list()
-  i <- 1
-  for (pca_group in stack) {
-    for (node in pca_group) {
-      out[[node]] <- colors[i]
-    }
-    i <- i + 1
-  }
-  return(out)
-}
+# graph@nodes
+fe <- graph@nodes[grep("Fe", graph@nodes)]
+si <- graph@nodes[grep("Si", graph@nodes)]
+ar <- graph@nodes[grep("Ar", graph@nodes)]
+xray <- graph@nodes[grep("X.ray", graph@nodes)]
 
-alt_colors <- c("lightyellow","lightgreen")
+remaining_vars <- length(graph@nodes)-(length(fe_col)+ length(si_col) + length(ar_col) + length(xray_col))
+print(remaining_vars)
+```
+
+
+```{r}
 ColoredNodes <- buildColorDict(si,ar,fe,xray)
+
+plot_dag2(graph, ColoredNodes,return=TRUE)
 ```
 
-
-
-
-```{r}
-
-convertNELtoStr <- function(dag, colorNodes) { # dag: Formal graphNEL, colorNodes: List
-  nodes <- dag@nodes
-  ans <- 'digraph { graph[layout=circo]'
-  
-  
-   # A [fillcolor=lightyellow, style=filled];
-  
-  # Add nodes
-  for (node in nodes) {
-    if (exists(node, where = colorNodes)) {
-      ans <- paste0(ans,'"',node,'" [fillcolor=', colorNodes[[node]], ', style=filled];')
-    } else {
-      ans <- paste0(ans,'"',node,'";')
-    }
-    
-    # ans <- paste0(ans,'"',node,'" [fillcolor=', colorNodes[[node]], ', style=filled];')
-    # ans <- paste0(ans,'"',node,'";')
-  }
-  
-  # Add edges
-  for (node in nodes) {
-    for (out_node_index in dag@edgeL[[node]]$edges) {
-      ans <- paste0(ans,'"', node,'" -> "', nodes[out_node_index], '";')
-    }
-  }
-  ans <- paste0(ans,'}')
-  
-  return(ans)
-}
-
-
-answer <- convertNELtoStr(graph, ColoredNodes)
-grViz(answer)
-```
-
-
-
-
-
-#create a simple DOT graph and load it in RStudio
-dot("digraph {A -> B;}")
-#to produce a dynamic document including a diagram in 'rmarkdown'
-## Not run:
-```{r echo=FALSE, results='asis'}
-library(DOT)
-
-```
-## End(Not run)
-#create a DOT graph and export a SVG file to the working directory
-dot("digraph {A -> B; B -> C; B -> D;}", file = "myfile.svg")
-#export the example above in PostScript format
-dot("digraph {A -> B; B -> C; B -> D;}", file = "myfile.ps")
-#create a DOT graph and save the script in a string object in R
-myString <- dot("digraph {A -> B;}", return = "verbatim")
-
-```{r}
-
-dot('digraph {"A" -> B; B -> C; B -> D;A;}', file = "myfile.svg")
-dot(answer, file = "test.svg")
-dot(answer)
-```
 
 
