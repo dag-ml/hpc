@@ -6,32 +6,15 @@ output: html_notebook
 ```{r}
 library(DiagrammeR)
 library(DOT)
+library(bnlearn)
 
 DATA_PATH <- paste0(getwd(), "/../data/")
 LIB_PATH <- paste0(getwd(), "/lib/")
 OUT_PATH <- paste0(getwd(), "/../graphs/")
-FULL_OUT_PATH <- paste0(OUT_PATH, "Single Node PCA/") # Change accordingly
+FULL_OUT_PATH <- paste0(OUT_PATH, "Full Nodes/") # Change accordingly
 
 PLOT <- paste0(LIB_PATH, "plot_Color.R")
-DOT_OUT_PATH <- paste0("/../graphs/Single Node PCA/") # Relative out path for DOT package
-
-```
- 
-
-```{r}
-# Example DOT Graph
-graph2 <- grViz ("
-  digraph {
-
-    A [fillcolor=lightyellow, style=filled];
-    B [fillcolor=blue, style=filled];
-    C [fillcolor=green, style=filled];
-    'A' -> B;
-    B -> C;
-    C -> A;
-  }")
-graph2
-
+DOT_OUT_PATH <- paste0("/../graphs/Full Nodes/") # Relative out path for DOT package
 
 ```
 
@@ -44,6 +27,7 @@ dataset <- datasets[1]
 load_Dataset <- paste0(LIB_PATH, dataset)
 source(load_Dataset)
 dag <- h2pc(dsub_set)
+graph <- as.graphNEL(dag)
 
 ```
 
@@ -55,16 +39,19 @@ si <- graph@nodes[grep("Si", graph@nodes)]
 ar <- graph@nodes[grep("Ar", graph@nodes)]
 xray <- graph@nodes[grep("X.ray", graph@nodes)]
 
-remaining_vars <- length(graph@nodes)-(length(fe_col)+ length(si_col) + length(ar_col) + length(xray_col))
-print(remaining_vars)
+# remaining_vars <- length(graph@nodes)-(length(fe_col)+ length(si_col) + length(ar_col) + length(xray_col))
+# print(remaining_vars)
 ```
 
 
 ```{r}
-ColoredNodes <- buildColorDict(si,ar,fe,xray)
+# ColoredNodes <- buildColorDict(si,ar,fe,xray)
 
 plot_dag2(graph, ColoredNodes,return=TRUE)
 ```
 
 
+```{r}
+names(laurenD)
+```
 

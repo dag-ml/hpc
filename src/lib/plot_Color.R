@@ -29,14 +29,20 @@ buildColorDict <- function(..., colors=c()) { # ... = lists of column names, col
   return(out)
 }
 
-convertNELtoStr <- function(dag, colorNodes=list(),edgeColors=list()) { # dag: Formal graphNEL, colorNodes: List[node=color]
+convertNELtoStr <- function(dag, colorNodes=list(),edgeColors=list(),layout="") { # dag: Formal graphNEL, colorNodes: List[node=color]
   # Converts a graphNEL object to a DOT language string
   # Assigns nodes and edges a color
+  # https://graphviz.org/docs/layouts/
   
   # TODO: Add EdgeColors
   
   nodes <- dag@nodes
-  ans <- 'digraph { graph[layout=circo]'
+  if (length(layout) <= 0) {
+    layout <- "dot"
+  } 
+  
+  ans <- paste0('digraph { graph[layout=',layout,']')
+  
   
   # Add nodes
   for (node in nodes) {

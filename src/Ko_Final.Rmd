@@ -1,5 +1,5 @@
 ---
-title: "H2PC"
+title: "H2PC - Ko Final"
 output: html_notebook
 ---
 
@@ -12,6 +12,11 @@ Install packages
 # install.packages(c("psych","lavaan"), dependencies=TRUE)
 # install.packages("mltools")
 
+```
+
+
+Setup
+```{r}
 # Load packages
 library(bnlearn)
 library(Rgraphviz)
@@ -21,32 +26,24 @@ library(mltools)
 library(data.table)
 library(DiagrammeR)
 library(DOT)
-```
 
-
-Setup Pathing
-```{r}
+# Set data path
 DATA_PATH <- paste0(getwd(), "/../data/")
 LIB_PATH <- paste0(getwd(), "/lib/")
+
 PLOT <- paste0(LIB_PATH, "plot_Color.R")
-DOT_OUT_PATH <- paste0("/../graphs/Single Node PCA/") # Relative out path for DOT package
+DOT_OUT_PATH <- paste0("/../graphs/Final Ko/") # Relative out path for DOT package
 
 source(PLOT)
 ```
 
 Select Dataset to Analyze
 ```{r}
-datasets <- c("ko.R","turner_GLDS351_Epiphysis.R", "turner_LSDS_30.R", "alwood_LSDS_15.R")
-dataset <- datasets[1]
+datasets <- c("final_ko1.R", "final_ko2.R")
+dataset <- datasets[2]
 load_Dataset <- paste0(LIB_PATH, dataset)
 source(load_Dataset)
 ```
-
-Default Colored Nodes for Single Node PCA
-```{r}
-ColoredNodes <- buildColorDict(c("mass"),c("trab"),c("stren"),c("dur"),c("unload"),c("expose"))
-```
-
 
 Build and Plot DAG
 ```{r}

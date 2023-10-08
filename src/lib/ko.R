@@ -9,7 +9,7 @@ ko2 <- read.csv(pko2, header=T, stringsAsFactors=F, na.strings=nastring)
 ko3 <- read.csv(pko3, header=T, stringsAsFactors=F, na.strings=nastring)
 ko4 <- read.csv(pko4, header=T, stringsAsFactors=F, skip=1)
 
-# Subest to needed columns/rows
+# Subset to needed columns/rows
 ko1 <- ko1[,c(1,3:4,8:10)]
 ko2 <- ko2[!(is.na(ko2$Source.Name)),c(1,7:11)]
 ko3 <- ko3[,c(1,10,13:17)]
@@ -33,10 +33,10 @@ ko123 <- merge(ko12,ko3,by="ID",all=T)
 ko1234 <- merge(ko123,ko4,by="ID",all=T) 
 
 # Fill in missing indicators with 0
-ko1234$k1[is.na(ko12$k1)] <-0
-ko1234$k2[is.na(ko12$k2)] <-0
-ko1234$k3[is.na(ko12$k3)] <-0
-ko1234$k4[is.na(ko12$k4)] <-0
+ko1234$k1[is.na(ko1234$k1)] <-0
+ko1234$k2[is.na(ko1234$k2)] <-0
+ko1234$k3[is.na(ko1234$k3)] <-0
+ko1234$k4[is.na(ko1234$k4)] <-0
 
 # Keep only needed rows
 ko <- ko1234[!(is.na(ko1234$stiffness)),]
@@ -50,21 +50,16 @@ ko$BMD <- as.numeric(as.character(ko$BMD))
 ko$trab.sep <- as.numeric(as.character(ko$trab.sep))
 ko$trab.num <- as.numeric(as.character(ko$trab.num))
 
+# Pruning ----------------------------------------------------------------------
 
-
-
-
-# # Keep only 4-week duration animals
-ko <- ko[ko$dur == 7, ]
+# Keep only 4-week duration animals
+# ko <- ko[ko$dur == 7, ]
 
 # Keep only 0%, 60%, and 80% unloaded animals
 ko <- ko[ko$unload %in% c(0, 60, 80), ]
 
 
-
-
-
-
+# PCA --------------------------------------------------------------------------
 mass <- pca(r=ko[,c("BVTV","BMD")], nfactors = 1, scores = T)
 trab <- pca(r=ko[,c("trab.sep","trab.num")], nfactors = 1, scores = T)
 form   <- pca(r=ko[,c("MSBS","BFRBS")], nfactors = 1, scores = T)
@@ -79,8 +74,10 @@ ko$form   <- as.vector(form$scores)
 
 
 ko <- ko[,c("unload","dur","expose","mass","trab","stren","resorp","form")]
+ko <- ko[,c("unload","dur","expose","mass","trab","stren")] # Drop resorp and form due to NA vals
 
-rm(list=c("mass","trab","form","stren"))
 
 dsub_set <- ko
-title <- "Ko"
+title <- "OSDR-477-608 (Ko)"
+
+rm(list=c("mass","trab","form","stren","ko1","ko2","ko3","ko4","ko12","ko123","ko1234"))

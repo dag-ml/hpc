@@ -1,17 +1,14 @@
-laur <- paste0(DATA_PATH, "lauren/clean2_assoc_100.csv")
+laur <- paste0(DATA_PATH, "lauren/drop_38b_chr_col_assoc_500.csv")
 laurenD <- read.csv(laur, header = TRUE, stringsAsFactors = FALSE)
 
-laurenD$chromosome <- NULL
+# Color Nodes
+fe <- names(laurenD)[grep("Fe", names(laurenD))]
+si <- names(laurenD)[grep("Si", names(laurenD))]
+ar <- names(laurenD)[grep("Ar", names(laurenD))]
+xray <- names(laurenD)[grep("X.ray", names(laurenD))]
 
-# laurenD$chromosome <- as.factor(laurenD$chromosome)
 
-# 
-# laurenD$chromosome <- as.factor(laurenD$chromosome)
-# laurenD <- one_hot(as.data.table(laurenD), cols = "chromosome", sparsifyNAs = TRUE,
-#                   naCols = FALSE, dropCols = TRUE, dropUnusedLevels = TRUE)
-
-# 
-# laurenD$position.b38. <- as.vector(scale(laurenD$position.b38., center = FALSE, scale = max(laurenD$position.b38.)))
-
+ColoredNodes <- buildColorDict(si,ar,fe,xray)
 dsub_set <- laurenD
-title <- "OSDR-366 (Lauren)- All"
+title <- "OSD-366 (Lauren)"
+
